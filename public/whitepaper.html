@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whitepaper</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="user-info">
+        Logged in as: <span id="username-display"></span>
+    </div>
+
+    <h1>Download our Whitepaper</h1>
+    <p>Here you can download our exclusive whitepaper.</p>
+
+    <script>
+        // Simulate passing the username from the server-side session
+        const loggedInUser = '<%= username %>'; // This will be dynamically passed by the server
+
+        // Display the username in the designated area
+        document.getElementById('username-display').innerText = loggedInUser;
+    </script>
+</body>
+</html>
