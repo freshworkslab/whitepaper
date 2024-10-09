@@ -34,11 +34,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded and parsed');
+            
             if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
                 console.log('fwcrm SDK is loaded and identify function is available!');
 
                 // Handle form submission
                 document.getElementById('registerForm').addEventListener('submit', function(event) {
+                    console.log('Form submission event triggered');
                     event.preventDefault();  // Prevent default form submission
 
                     // Capture form data
@@ -47,6 +50,8 @@
                     const email = document.getElementById('email').value;
                     const companyName = document.getElementById('companyName').value;
                     const companyWebsite = document.getElementById('companyWebsite').value;
+
+                    console.log('Form data captured:', { firstName, lastName, email, companyName, companyWebsite });
 
                     // Create user data object
                     const new_contact = {
@@ -62,17 +67,16 @@
                     // Use the email as the identifier
                     const identifier = email;
 
+                    console.log('Attempting to call fwcrm.identify');
                     try {
                         // Call fwcrm.identify (with a callback)
                         fwcrm.identify(identifier, new_contact, function(response) {
-                            console.log("CRM Response:", response);  // Debug response
+                            console.log("CRM Response received:", response);
 
                             if (response && response.success) {
                                 console.log("Contact created successfully in CRM:", response);
-                                alert("Contact registered successfully in CRM!");
-
-                                // Redirect to login page after successful contact creation
-                                window.location.href = '/login';
+                                // Success message (no redirection)
+                                console.log("Registration successful. Redirection removed for debugging.");
                             } else {
                                 console.error("Error creating contact in CRM:", response);
                                 alert("Error occurred while creating contact.");
