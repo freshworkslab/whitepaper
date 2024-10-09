@@ -8,110 +8,54 @@
 </head>
 <body>
     <h1>Register</h1>
-    <form id="registerForm" action="/register" method="POST">
-        <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required><br><br>
-
-        <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required><br><br>
-
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required><br><br>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required><br><br>
-
-        <label for="companyName">Company Name:</label>
-        <input type="text" id="companyName" name="companyName" placeholder="Enter your company name" required><br><br>
-
-        <label for="companyWebsite">Company Website:</label>
-        <input type="url" id="companyWebsite" name="companyWebsite" placeholder="Enter your company website" required><br><br>
-
-        <button type="submit">Register</button>
-    </form>
-
-    <p>Already have an account? <a href="/login">Login here</a></p>
-
     <div id="message"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM fully loaded and parsed');
             
-            const form = document.getElementById('registerForm');
             const messageDiv = document.getElementById('message');
 
             // Debug fwcrm object
-            console.log('fwcrm object:', fwcrm);
-            console.log('fwcrm.identify:', fwcrm.identify);
+            console.log('fwcrm object:', window.fwcrm);
 
             if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
                 console.log('fwcrm SDK is loaded and identify function is available!');
 
-                form.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    console.log('Form submission event triggered');
-
-                    const firstName = document.getElementById('firstName').value;
-                    const lastName = document.getElementById('lastName').value;
-                    const email = document.getElementById('email').value;
-                    const companyName = document.getElementById('companyName').value;
-                    const companyWebsite = document.getElementById('companyWebsite').value;
-
-                    console.log('Form data captured:', { firstName, lastName, email, companyName, companyWebsite });
-
-                    const new_contact = {
-                        "FirstName": firstName,
-                        "LastName": lastName,
-                        "Email": email,
-                        "company": {
-                            "Name": companyName,
-                            "Website": companyWebsite
-                        }
-                    };
-
-                    const identifier = email;
-
-                    console.log('Attempting to call fwcrm.identify');
-                    messageDiv.textContent = "Processing your registration...";
-
-                    let callbackExecuted = false;
-
-                    try {
-                        new Promise((resolve, reject) => {
-                            fwcrm.identify(identifier, new_contact, function(response) {
-                                callbackExecuted = true;
-                                console.log("Inside fwcrm.identify callback");
-                                console.log("CRM Response received:", response);
-                                resolve(response);
-                            });
-                        }).then(response => {
-                            if (response && response.success) {
-                                console.log("Contact created successfully in CRM:", response);
-                                messageDiv.textContent = "Registration successful!";
-                                window.location.href = '/login'; // Redirect to login on success
-                            } else {
-                                console.error("Error creating contact in CRM:", response);
-                                messageDiv.textContent = "Error occurred while creating contact.";
-                            }
-                        }).catch(error => {
-                            console.error("Error in fwcrm.identify Promise:", error);
-                            messageDiv.textContent = "An error occurred during registration.";
-                        });
-
-                        setTimeout(function() {
-                            if (!callbackExecuted) {
-                                console.error("fwcrm.identify callback was not executed within the timeout period");
-                                messageDiv.textContent = "Registration is taking longer than expected. Please check your network connection and try again.";
-                            }
-                        }, 30000); // Increase timeout to 30 seconds for testing
-
-                    } catch (error) {
-                        console.error("Exception occurred while calling fwcrm.identify:", error);
-                        messageDiv.textContent = "An error occurred. Please try again.";
+                // Test with hardcoded values
+                const new_contact = {
+                    "First name": "John",
+                    "Last name": "Doe",
+                    "Email": "john.doe@example.com",
+                    "Alternate contact number": "98765432",
+                    "company": {
+                        "Name": "Example.com",
+                        "Website": "www.example.com"
                     }
-                    console.log("End of form submission handler");
-                });
+                };
+                const identifier = "john.doe@example.com";
+
+                console.log('Attempting to call fwcrm.identify with test data');
+                messageDiv.textContent = "Processing your registration...";
+
+                try {
+                    fwcrm.identify(identifier, new_contact, function(response) {
+                        console.log("Inside fwcrm.identify callback");
+                        console.log("CRM Response received:", response);
+                        if (response && response.success) {
+                            console.log("Contact created successfully in CRM:", response);
+                            messageDiv.textContent = "Registration successful!";
+                            window.location.href = '/login'; // Redirect to login on success
+                        } else {
+                            console.error("Error creating contact in CRM:", response);
+                            messageDiv.textContent = "Error occurred while creating contact.";
+                        }
+                    });
+                } catch (error) {
+                    console.error("Exception occurred while calling fwcrm.identify:", error);
+                    messageDiv.textContent = "An error occurred. Please try again.";
+                }
+                console.log("End of form submission handler");
             } else {
                 console.error('fwcrm SDK is not loaded or identify function is unavailable.');
                 messageDiv.textContent = "Error: CRM SDK not available.";
