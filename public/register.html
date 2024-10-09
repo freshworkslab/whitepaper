@@ -106,7 +106,7 @@
                                 console.error("fwcrm.identify callback was not executed within the timeout period");
                                 messageDiv.textContent = "Registration is taking longer than expected. Please check your network connection and try again.";
                             }
-                        }, 15000); // 15 second timeout
+                        }, 30000); // Increase timeout to 30 seconds for testing
 
                     } catch (error) {
                         console.error("Exception occurred while calling fwcrm.identify:", error);
