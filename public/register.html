@@ -32,19 +32,62 @@
 
     <p>Already have an account? <a href="/login">Login here</a></p>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle form submission
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault();  // Prevent the default form submission
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
+                console.log('fwcrm SDK is loaded and identify function is available!');
 
-            console.log('Form submitted, redirecting to /login...');
+                // Handle form submission
+                document.getElementById('registerForm').addEventListener('submit', function(event) {
+                    event.preventDefault();  // Prevent default form submission
 
-            // Test redirection directly
-            window.location.href = '/login';
+                    // Capture form data
+                    const firstName = document.getElementById('firstName').value;
+                    const lastName = document.getElementById('lastName').value;
+                    const email = document.getElementById('email').value;
+                    const companyName = document.getElementById('companyName').value;
+                    const companyWebsite = document.getElementById('companyWebsite').value;
+
+                    // Create user data object
+                    const new_contact = {
+                        "FirstName": firstName,
+                        "LastName": lastName,
+                        "Email": email,
+                        "company": {
+                            "Name": companyName,
+                            "Website": companyWebsite
+                        }
+                    };
+
+                    // Use the email as the identifier
+                    const identifier = email;
+
+                    try {
+                        // Call fwcrm.identify (with a callback)
+                        fwcrm.identify(identifier, new_contact, function(response) {
+                            console.log("CRM Response:", response);  // Debug response
+
+                            if (response && response.success) {
+                                console.log("Contact created successfully in CRM:", response);
+                                alert("Contact registered successfully in CRM!");
+
+                                // Redirect to login page after successful contact creation
+                                window.location.href = '/login';
+                            } else {
+                                console.error("Error creating contact in CRM:", response);
+                                alert("Error occurred while creating contact.");
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Exception occurred while calling fwcrm.identify:", error);
+                        alert("An error occurred. Please try again.");
+                    }
+                });
+            } else {
+                console.error('fwcrm SDK is not loaded or identify function is unavailable.');
+                alert("Error: CRM SDK not available.");
+            }
         });
-    });
-</script>
-
+    </script>
 </body>
 </html>
