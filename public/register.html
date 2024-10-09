@@ -31,26 +31,19 @@
     </form>
 
     <p>Already have an account? <a href="/login">Login here</a></p>
+
     <div id="message"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded and parsed');
+            
             const form = document.getElementById('registerForm');
             const messageDiv = document.getElementById('message');
 
-            // Check if fwcrm SDK is loaded
-            function initializeSDK() {
-                if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
-                    console.log('fwcrm SDK is loaded and identify function is available!');
-                    setupFormSubmission();
-                } else {
-                    console.error('fwcrm SDK is not loaded or identify function is unavailable.');
-                    messageDiv.textContent = "Error: CRM SDK not available.";
-                }
-            }
+            if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
+                console.log('fwcrm SDK is loaded and identify function is available!');
 
-            // Form submission handling
-            function setupFormSubmission() {
                 form.addEventListener('submit', function(event) {
                     event.preventDefault();
                     console.log('Form submission event triggered');
@@ -62,13 +55,6 @@
                     const companyWebsite = document.getElementById('companyWebsite').value;
 
                     console.log('Form data captured:', { firstName, lastName, email, companyName, companyWebsite });
-
-                    // Basic email validation
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(email)) {
-                        messageDiv.textContent = "Please enter a valid email address.";
-                        return;
-                    }
 
                     const new_contact = {
                         "FirstName": firstName,
@@ -89,6 +75,10 @@
 
                     try {
                         new Promise((resolve, reject) => {
+                            console.log("Before calling fwcrm.identify");
+                            console.log("Identifier:", identifier);
+                            console.log("New Contact Data:", new_contact);
+
                             fwcrm.identify(identifier, new_contact, function(response) {
                                 callbackExecuted = true;
                                 console.log("Inside fwcrm.identify callback");
@@ -108,13 +98,13 @@
                             messageDiv.textContent = "An error occurred during registration.";
                         });
 
-                        // Shortened timeout duration for testing
+                        // Increased timeout duration
                         setTimeout(function() {
                             if (!callbackExecuted) {
                                 console.error("fwcrm.identify callback was not executed within the timeout period");
                                 messageDiv.textContent = "Registration is taking longer than expected. Please check your network connection and try again.";
                             }
-                        }, 5000); // 5 second timeout for testing
+                        }, 20000); // 20 second timeout for better testing
 
                     } catch (error) {
                         console.error("Exception occurred while calling fwcrm.identify:", error);
@@ -122,13 +112,10 @@
                     }
                     console.log("End of form submission handler");
                 });
+            } else {
+                console.error('fwcrm SDK is not loaded or identify function is unavailable.');
+                messageDiv.textContent = "Error: CRM SDK not available.";
             }
-
-            // Load the SDK and then set up the form submission
-            const script = document.createElement('script');
-            script.src = '//in.fw-cdn.com/31677810/851659.js';
-            script.onload = initializeSDK; // Call initializeSDK once the script loads
-            document.head.appendChild(script);
         });
     </script>
 </body>
