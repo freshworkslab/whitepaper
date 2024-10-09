@@ -7,30 +7,7 @@
     <script src='//in.fw-cdn.com/31677810/851659.js' chat='true'></script>
 </head>
 <body>
-    <h1>Register</h1>
-    <form id="registerForm" action="/register" method="POST">
-        <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required><br><br>
-
-        <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required><br><br>
-
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required><br><br>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required><br><br>
-
-        <label for="companyName">Company Name:</label>
-        <input type="text" id="companyName" name="companyName" placeholder="Enter your company name" required><br><br>
-
-        <label for="companyWebsite">Company Website:</label>
-        <input type="url" id="companyWebsite" name="companyWebsite" placeholder="Enter your company website" required><br><br>
-
-        <button type="submit">Register</button>
-    </form>
-
-    <p>Already have an account? <a href="/login">Login here</a></p>
+    <!-- ... (previous HTML remains the same) ... -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -39,12 +16,10 @@
             if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
                 console.log('fwcrm SDK is loaded and identify function is available!');
 
-                // Handle form submission
                 document.getElementById('registerForm').addEventListener('submit', function(event) {
                     console.log('Form submission event triggered');
-                    event.preventDefault();  // Prevent default form submission
+                    event.preventDefault();
 
-                    // Capture form data
                     const firstName = document.getElementById('firstName').value;
                     const lastName = document.getElementById('lastName').value;
                     const email = document.getElementById('email').value;
@@ -53,7 +28,6 @@
 
                     console.log('Form data captured:', { firstName, lastName, email, companyName, companyWebsite });
 
-                    // Create user data object
                     const new_contact = {
                         "FirstName": firstName,
                         "LastName": lastName,
@@ -64,28 +38,28 @@
                         }
                     };
 
-                    // Use the email as the identifier
                     const identifier = email;
 
                     console.log('Attempting to call fwcrm.identify');
                     try {
-                        // Call fwcrm.identify (with a callback)
                         fwcrm.identify(identifier, new_contact, function(response) {
+                            console.log("Inside fwcrm.identify callback");
                             console.log("CRM Response received:", response);
 
                             if (response && response.success) {
                                 console.log("Contact created successfully in CRM:", response);
-                                // Success message (no redirection)
                                 console.log("Registration successful. Redirection removed for debugging.");
                             } else {
                                 console.error("Error creating contact in CRM:", response);
                                 alert("Error occurred while creating contact.");
                             }
                         });
+                        console.log("fwcrm.identify call completed");
                     } catch (error) {
                         console.error("Exception occurred while calling fwcrm.identify:", error);
                         alert("An error occurred. Please try again.");
                     }
+                    console.log("End of form submission handler");
                 });
             } else {
                 console.error('fwcrm SDK is not loaded or identify function is unavailable.');
