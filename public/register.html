@@ -96,12 +96,13 @@
                             messageDiv.textContent = "An error occurred during registration.";
                         });
 
+                        // Increased timeout duration to 30 seconds
                         setTimeout(function() {
                             if (!callbackExecuted) {
                                 console.error("fwcrm.identify callback was not executed within the timeout period");
                                 messageDiv.textContent = "Registration is taking longer than expected. Please check your network connection and try again.";
                             }
-                        }, 15000); // 15 second timeout
+                        }, 30000); // 30 second timeout
 
                     } catch (error) {
                         console.error("Exception occurred while calling fwcrm.identify:", error);
