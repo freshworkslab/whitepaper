@@ -31,14 +31,16 @@
     </form>
 
     <p>Already have an account? <a href="/login">Login here</a></p>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Ensure fwcrm is loaded and available
         if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
             console.log('fwcrm SDK is loaded and identify function is available!');
 
             // Handle form submission
             document.getElementById('registerForm').addEventListener('submit', function(event) {
-                event.preventDefault();  // Prevent default form submission
+                event.preventDefault();  // Prevent the default form submission
 
                 // Capture form data
                 const firstName = document.getElementById('firstName').value;
@@ -47,7 +49,7 @@
                 const companyName = document.getElementById('companyName').value;
                 const companyWebsite = document.getElementById('companyWebsite').value;
 
-                // Create user data object
+                // Create a contact object with the form data
                 const new_contact = {
                     "FirstName": firstName,
                     "LastName": lastName,
@@ -62,22 +64,22 @@
                 const identifier = email;
 
                 try {
-                    // Call fwcrm.identify (with a callback)
+                    // Call fwcrm.identify and handle the response
                     fwcrm.identify(identifier, new_contact, function(response) {
-                        if (response && response.success) {  // Assuming success property exists in the response
+                        if (response && response.success) {  // Assuming success is returned in the response
                             console.log("Contact created successfully in CRM:", response);
                             alert("Contact registered successfully in CRM!");
 
-                            // Redirect to login page after successful contact creation
+                            // Redirect to login page after successful registration
                             window.location.href = '/login';
                         } else {
-                            console.error("Error creating contact in CRM. Invalid or no response received.", response);
-                            alert("Error occurred while creating contact.");
+                            console.error("Error creating contact in CRM:", response);
+                            alert("An error occurred while creating the contact.");
                         }
                     });
                 } catch (error) {
-                    console.error("Exception occurred while calling fwcrm.identify:", error);
-                    alert("An error occurred. Please try again.");
+                    console.error("Exception occurred during fwcrm.identify call:", error);
+                    alert("An unexpected error occurred. Please try again.");
                 }
             });
         } else {
@@ -87,4 +89,5 @@
     });
 </script>
 
-    </body>
+</body>
+</html>
