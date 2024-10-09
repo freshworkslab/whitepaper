@@ -71,12 +71,8 @@
                                 console.log("Contact created successfully in CRM:", response);
                                 alert("Contact registered successfully in CRM!");
 
-                                // Check if redirection URL is valid
-                                const redirectUrl = '/login';
-                                console.log("Redirecting to:", redirectUrl);
-                                
                                 // Redirect to login page after successful contact creation
-                                window.location.href = redirectUrl;
+                                window.location.href = '/login';
                             } else {
                                 console.error("Error creating contact in CRM:", response);
                                 alert("Error occurred while creating contact.");
