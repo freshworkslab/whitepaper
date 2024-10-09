@@ -41,12 +41,9 @@
             const form = document.getElementById('registerForm');
             const messageDiv = document.getElementById('message');
 
-            // Network request logging
-            const originalFetch = window.fetch;
-            window.fetch = function() {
-                console.log('Network request:', arguments);
-                return originalFetch.apply(this, arguments);
-            };
+            // Debug fwcrm object
+            console.log('fwcrm object:', fwcrm);
+            console.log('fwcrm.identify:', fwcrm.identify);
 
             if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
                 console.log('fwcrm SDK is loaded and identify function is available!');
@@ -81,11 +78,16 @@
                     let callbackExecuted = false;
 
                     try {
-                        fwcrm.identify(identifier, new_contact, function(response) {
-                            callbackExecuted = true;
-                            console.log("Inside fwcrm.identify callback");
-                            console.log("CRM Response received:", response);
-
+                        // Wrap the fwcrm.identify call in a Promise
+                        new Promise((resolve, reject) => {
+                            fwcrm.identify(identifier, new_contact, function(response) {
+                                callbackExecuted = true;
+                                console.log("Inside fwcrm.identify callback");
+                                console.log("CRM Response received:", response);
+                                resolve(response);
+                            });
+                            console.log("fwcrm.identify call completed");
+                        }).then(response => {
                             if (response && response.success) {
                                 console.log("Contact created successfully in CRM:", response);
                                 messageDiv.textContent = "Registration successful!";
@@ -93,8 +95,10 @@
                                 console.error("Error creating contact in CRM:", response);
                                 messageDiv.textContent = "Error occurred while creating contact.";
                             }
+                        }).catch(error => {
+                            console.error("Error in fwcrm.identify Promise:", error);
+                            messageDiv.textContent = "An error occurred during registration.";
                         });
-                        console.log("fwcrm.identify call completed");
 
                         // Set a timeout to check if the callback was executed
                         setTimeout(function() {
@@ -102,7 +106,7 @@
                                 console.error("fwcrm.identify callback was not executed within the timeout period");
                                 messageDiv.textContent = "Registration is taking longer than expected. Please check your network connection and try again.";
                             }
-                        }, 15000); // Extended to 15 second timeout
+                        }, 15000); // 15 second timeout
 
                     } catch (error) {
                         console.error("Exception occurred while calling fwcrm.identify:", error);
