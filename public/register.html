@@ -64,19 +64,20 @@
                 try {
                     // Call fwcrm.identify (with a callback)
                     fwcrm.identify(identifier, new_contact, function(response) {
-                        if (response) {
+                        if (response && response.success) {  // Assuming success property exists in the response
                             console.log("Contact created successfully in CRM:", response);
                             alert("Contact registered successfully in CRM!");
-                            
+
                             // Redirect to login page after successful contact creation
                             window.location.href = '/login';
                         } else {
-                            console.error("Error creating contact in CRM. No response received.");
+                            console.error("Error creating contact in CRM. Invalid or no response received.", response);
                             alert("Error occurred while creating contact.");
                         }
                     });
                 } catch (error) {
                     console.error("Exception occurred while calling fwcrm.identify:", error);
+                    alert("An error occurred. Please try again.");
                 }
             });
         } else {
