@@ -45,7 +45,7 @@
                 console.log('fwcrm SDK is loaded and identify function is available!');
 
                 form.addEventListener('submit', function(event) {
-                    event.preventDefault();  // Prevent the form from submitting normally
+                    event.preventDefault();
                     console.log('Form submission event triggered');
 
                     const firstName = document.getElementById('firstName').value;
@@ -69,8 +69,13 @@
                     const identifier = email;
 
                     console.log('Attempting to call fwcrm.identify');
+                    messageDiv.textContent = "Processing your registration...";
+
+                    let callbackExecuted = false;
+
                     try {
                         fwcrm.identify(identifier, new_contact, function(response) {
+                            callbackExecuted = true;
                             console.log("Inside fwcrm.identify callback");
                             console.log("CRM Response received:", response);
 
@@ -83,6 +88,15 @@
                             }
                         });
                         console.log("fwcrm.identify call completed");
+
+                        // Set a timeout to check if the callback was executed
+                        setTimeout(function() {
+                            if (!callbackExecuted) {
+                                console.error("fwcrm.identify callback was not executed within the timeout period");
+                                messageDiv.textContent = "Registration timed out. Please try again.";
+                            }
+                        }, 5000); // 5 second timeout
+
                     } catch (error) {
                         console.error("Exception occurred while calling fwcrm.identify:", error);
                         messageDiv.textContent = "An error occurred. Please try again.";
