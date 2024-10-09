@@ -18,6 +18,9 @@
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" placeholder="Enter your email" required><br><br>
 
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required><br><br>
+
         <label for="companyName">Company Name:</label>
         <input type="text" id="companyName" name="companyName" placeholder="Enter your company name" required><br><br>
 
@@ -28,19 +31,26 @@
     </form>
 
     <p>Already have an account? <a href="/login">Login here</a></p>
-
     <div id="message"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM fully loaded and parsed');
-            
             const form = document.getElementById('registerForm');
             const messageDiv = document.getElementById('message');
 
-            if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
-                console.log('fwcrm SDK is loaded and identify function is available!');
+            // Check if fwcrm SDK is loaded
+            function initializeSDK() {
+                if (typeof fwcrm !== 'undefined' && typeof fwcrm.identify === 'function') {
+                    console.log('fwcrm SDK is loaded and identify function is available!');
+                    setupFormSubmission();
+                } else {
+                    console.error('fwcrm SDK is not loaded or identify function is unavailable.');
+                    messageDiv.textContent = "Error: CRM SDK not available.";
+                }
+            }
 
+            // Form submission handling
+            function setupFormSubmission() {
                 form.addEventListener('submit', function(event) {
                     event.preventDefault();
                     console.log('Form submission event triggered');
@@ -52,6 +62,13 @@
                     const companyWebsite = document.getElementById('companyWebsite').value;
 
                     console.log('Form data captured:', { firstName, lastName, email, companyName, companyWebsite });
+
+                    // Basic email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        messageDiv.textContent = "Please enter a valid email address.";
+                        return;
+                    }
 
                     const new_contact = {
                         "FirstName": firstName,
@@ -82,11 +99,6 @@
                             if (response && response.success) {
                                 console.log("Contact created successfully in CRM:", response);
                                 messageDiv.textContent = "Registration successful!";
-                                
-                                // Redirect after successful registration
-                                setTimeout(() => {
-                                    window.location.href = '/login';
-                                }, 2000); // Redirect after 2 seconds
                             } else {
                                 console.error("Error creating contact in CRM:", response);
                                 messageDiv.textContent = "Error occurred while creating contact.";
@@ -96,13 +108,13 @@
                             messageDiv.textContent = "An error occurred during registration.";
                         });
 
-                        // Increased timeout duration to 30 seconds
+                        // Shortened timeout duration for testing
                         setTimeout(function() {
                             if (!callbackExecuted) {
                                 console.error("fwcrm.identify callback was not executed within the timeout period");
                                 messageDiv.textContent = "Registration is taking longer than expected. Please check your network connection and try again.";
                             }
-                        }, 30000); // 30 second timeout
+                        }, 5000); // 5 second timeout for testing
 
                     } catch (error) {
                         console.error("Exception occurred while calling fwcrm.identify:", error);
@@ -110,10 +122,13 @@
                     }
                     console.log("End of form submission handler");
                 });
-            } else {
-                console.error('fwcrm SDK is not loaded or identify function is unavailable.');
-                messageDiv.textContent = "Error: CRM SDK not available.";
             }
+
+            // Load the SDK and then set up the form submission
+            const script = document.createElement('script');
+            script.src = '//in.fw-cdn.com/31677810/851659.js';
+            script.onload = initializeSDK; // Call initializeSDK once the script loads
+            document.head.appendChild(script);
         });
     </script>
 </body>
